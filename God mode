@@ -1,5 +1,5 @@
 --[[
-	ADMIN PANEL - MEGA RAINBOW EDITION (FIXED STABILITY)
+	Main Menu
 ]]
 
 local Players = game:GetService("Players")
@@ -33,7 +33,7 @@ UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
 Title.Parent = MainFrame
 Title.Size = UDim2.new(1, 0, 0, 40)
-Title.Text = "Admin Panel" 
+Title.Text = "Main Menu" 
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 18
 Instance.new("UICorner", Title).CornerRadius = UDim.new(0, 15)
