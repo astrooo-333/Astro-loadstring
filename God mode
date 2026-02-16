@@ -1,95 +1,249 @@
+--[[
+	ADMIN PANEL - MEGA RAINBOW EDITION (FIXED STABILITY)
+]]
+
 local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local LocalPlayer = Players.LocalPlayer
-local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local GodmodeEnabled = false
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
 
+local lp = Players.LocalPlayer
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "GodmodeGUI"
-ScreenGui.Parent = game.CoreGui
+ScreenGui.Parent = CoreGui
 
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 0, 0, 0)
-Frame.Position = UDim2.new(0.5, 0, 0.1, 0)
-Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Frame.BorderSizePixel = 0
-Frame.BackgroundTransparency = 0.2
-Frame.Parent = ScreenGui
-Frame.AnchorPoint = Vector2.new(0.5, 0)
-Frame.Active = true
-Frame.Draggable = true
+local MainFrame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local CreditLabel = Instance.new("TextLabel")
+local UIStroke = Instance.new("UIStroke")
 
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 12)
-UICorner.Parent = Frame
+-- UI SETUP
+MainFrame.Name = "AdminPanel_MegaRainbow"
+MainFrame.Parent = ScreenGui
+MainFrame.Position = UDim2.new(0.5, -115, 0.5, -210)
+MainFrame.Size = UDim2.new(0, 230, 0, 460) 
+MainFrame.Active = true
+MainFrame.Draggable = true
 
-local Button = Instance.new("TextButton")
-Button.Size = UDim2.new(0, 180, 0, 40)
-Button.Position = UDim2.new(0, 10, 0, 10)
-Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-Button.BorderSizePixel = 0
-Button.Text = "Enable Godmode"
-Button.Font = Enum.Font.GothamBold
-Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-Button.TextSize = 16
-Button.Parent = Frame
+local UICorner = Instance.new("UICorner", MainFrame)
+UICorner.CornerRadius = UDim.new(0, 15)
 
-local ButtonUICorner = Instance.new("UICorner")
-ButtonUICorner.CornerRadius = UDim.new(0, 8)
-ButtonUICorner.Parent = Button
+UIStroke.Parent = MainFrame
+UIStroke.Thickness = 3
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
-local Credit = Instance.new("TextLabel")
-Credit.Size = UDim2.new(0, 180, 0, 20)
-Credit.Position = UDim2.new(0, 10, 0, 60)
-Credit.BackgroundTransparency = 1
-Credit.Text = "--Made By HilosHAX--"
-Credit.Font = Enum.Font.GothamSemibold
-Credit.TextColor3 = Color3.fromRGB(150, 150, 150)
-Credit.TextSize = 14
-Credit.Parent = Frame
+Title.Parent = MainFrame
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Text = "Admin Panel" 
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 18
+Instance.new("UICorner", Title).CornerRadius = UDim.new(0, 15)
 
-TweenService:Create(Frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0, 200, 0, 100)}):Play()
+CreditLabel.Parent = MainFrame
+CreditLabel.Size = UDim2.new(1, 0, 0, 20)
+CreditLabel.Position = UDim2.new(0, 0, 0.96, 0)
+CreditLabel.Text = "By sweet_orange"
+CreditLabel.BackgroundTransparency = 1
+CreditLabel.Font = Enum.Font.GothamBold
+CreditLabel.TextSize = 12
 
-local GlowTween = TweenService:Create(Button, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, -1, true), {BackgroundColor3 = Color3.fromRGB(70, 70, 70)})
-GlowTween:Play()
+local allBackgrounds = {MainFrame, Title}
+local allTexts = {Title, CreditLabel}
 
-function setupGodmode()
-    for _, part in pairs(workspace:GetDescendants()) do
-        if part:IsA("BasePart") then
-            if string.find(part.Name:lower(), "kill") or string.find(part.Name:lower(), "lava") or part.Material == Enum.Material.Neon then
-                part.CanTouch = false
-                part.CanCollide = false
-                part.Transparency = 0.5
-            end
-        end
-    end
+-- NOTIFICATION FUNCTION
+local function CreateNotify(text, delayTime)
+    local PopUpFrame = Instance.new("Frame")
+    local PopUpCorner = Instance.new("UICorner", PopUpFrame)
+    local PopUpText = Instance.new("TextLabel", PopUpFrame)
+    PopUpFrame.Parent = ScreenGui
+    PopUpFrame.Size = UDim2.new(0, 220, 0, 50)
+    PopUpFrame.Position = UDim2.new(0.5, -110, -0.2, 0) 
+    PopUpCorner.CornerRadius = UDim.new(0, 12)
+    PopUpText.Size = UDim2.new(1, 0, 1, 0)
+    PopUpText.BackgroundTransparency = 1
+    PopUpText.Text = text
+    PopUpText.Font = Enum.Font.GothamBold
+    PopUpText.TextSize = 16
+    table.insert(allBackgrounds, PopUpFrame)
+    table.insert(allTexts, PopUpText)
+    PopUpFrame:TweenPosition(UDim2.new(0.5, -110, 0.05, 0), "Out", "Back", 0.8, true)
+    task.delay(delayTime, function()
+        PopUpFrame:TweenPosition(UDim2.new(0.5, -110, -0.2, 0), "In", "Quad", 0.5, true, function()
+            PopUpFrame:Destroy()
+        end)
+    end)
 end
 
-function revertGodmode()
-    for _, part in pairs(workspace:GetDescendants()) do
-        if part:IsA("BasePart") then
-            if string.find(part.Name:lower(), "kill") or string.find(part.Name:lower(), "lava") or part.Material == Enum.Material.Neon then
-                part.CanTouch = true
-                part.CanCollide = true
-                part.Transparency = 0
-            end
-        end
-    end
+-- STARTUP SEQUENCE
+task.spawn(function()
+    CreateNotify("Admin Panel: Loading...", 2)
+    task.wait(2.3)
+    CreateNotify("Welcome! By sweet_orange", 2)
+end)
+
+local function createBtn(text, pos)
+    local btn = Instance.new("TextButton")
+    btn.Parent = MainFrame
+    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Position = pos
+    btn.Text = text
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(1, 0) 
+    table.insert(allBackgrounds, btn)
+    table.insert(allTexts, btn)
+    return btn
 end
 
-Button.MouseButton1Click:Connect(function()
-    GodmodeEnabled = not GodmodeEnabled
-    if GodmodeEnabled then
-        setupGodmode()
-        Button.Text = "Disable Godmode"
-    else
-        revertGodmode()
-        Button.Text = "Enable Godmode"
+local FlyBtn = createBtn("Fly: OFF", UDim2.new(0.05, 0, 0.12, 0))
+local NoclipBtn = createBtn("Noclip: OFF", UDim2.new(0.05, 0, 0.21, 0))
+local BToolBtn = createBtn("Give Classic BTools", UDim2.new(0.05, 0, 0.35, 0))
+local GodBtn = createBtn("God Mode: OFF", UDim2.new(0.05, 0, 0.45, 0))
+
+local SpeedInput = Instance.new("TextBox", MainFrame)
+SpeedInput.Size = UDim2.new(0.9, 0, 0, 55) 
+SpeedInput.Position = UDim2.new(0.05, 0, 0.56, 0)
+SpeedInput.PlaceholderText = "YOUR SPEED" 
+SpeedInput.Text = "16"
+SpeedInput.Font = Enum.Font.GothamBold
+SpeedInput.TextSize = 22
+Instance.new("UICorner", SpeedInput).CornerRadius = UDim.new(0, 15)
+table.insert(allBackgrounds, SpeedInput)
+table.insert(allTexts, SpeedInput)
+
+local TargetBox = Instance.new("TextBox", MainFrame)
+TargetBox.Size = UDim2.new(0.9, 0, 0, 35)
+TargetBox.Position = UDim2.new(0.05, 0, 0.71, 0)
+TargetBox.PlaceholderText = "Target Name..."
+TargetBox.Font = Enum.Font.GothamBold
+TargetBox.TextSize = 14
+Instance.new("UICorner", TargetBox).CornerRadius = UDim.new(1, 0)
+table.insert(allBackgrounds, TargetBox)
+table.insert(allTexts, TargetBox)
+
+local FlingBtn = createBtn("Fling Target", UDim2.new(0.05, 0, 0.82, 0))
+
+-- RAINBOW ENGINE
+task.spawn(function()
+    while true do
+        for i = 0, 1, 0.005 do
+            local bgCol = Color3.fromHSV(i, 0.6, 0.3)
+            local mainCol = Color3.fromHSV(i, 0.8, 1)
+            UIStroke.Color = mainCol
+            for _, bg in pairs(allBackgrounds) do
+                if bg:IsA("Frame") or bg:IsA("TextButton") or bg:IsA("TextBox") or bg:IsA("TextLabel") then
+                    bg.BackgroundColor3 = bgCol
+                end
+            end
+            for _, txt in pairs(allTexts) do
+                txt.TextColor3 = mainCol
+            end
+            task.wait(0.02)
+        end
     end
 end)
 
-LocalPlayer.CharacterAdded:Connect(function(char)
-    if ScreenGui then
-        ScreenGui:Destroy()
+-- LOGIC FUNCTIONS
+local function GetPlayer(String)
+    if not String or String == "" then return nil end
+    for _, v in pairs(Players:GetPlayers()) do
+        if v.Name:lower():sub(1, #String) == String:lower() or v.DisplayName:lower():sub(1, #String) == String:lower() then
+            return v
+        end
+    end
+end
+
+SpeedInput.FocusLost:Connect(function()
+    local s = tonumber(SpeedInput.Text)
+    if s and lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then
+        lp.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = s
+    end
+end)
+
+local flying = false
+FlyBtn.MouseButton1Click:Connect(function()
+    flying = not flying
+    FlyBtn.Text = "Fly: " .. (flying and "ON" or "OFF")
+    local char = lp.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if flying then
+        local bv = Instance.new("BodyVelocity", root) bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+        local bg = Instance.new("BodyGyro", root) bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+        task.spawn(function()
+            while flying and char.Parent do
+                local cam = workspace.CurrentCamera
+                local dir = Vector3.new(0,0,0)
+                if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir += cam.CFrame.LookVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir -= cam.CFrame.LookVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir -= cam.CFrame.RightVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir += cam.CFrame.RightVector end
+                bv.Velocity = dir * 70 bg.CFrame = cam.CFrame
+                RunService.RenderStepped:Wait()
+            end
+            bv:Destroy() bg:Destroy()
+        end)
+    end
+end)
+
+local noclip = false
+NoclipBtn.MouseButton1Click:Connect(function() noclip = not noclip NoclipBtn.Text = "Noclip: " .. (noclip and "ON" or "OFF") end)
+RunService.Stepped:Connect(function() if noclip and lp.Character then for _, v in pairs(lp.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end end)
+
+BToolBtn.MouseButton1Click:Connect(function() for _, t in pairs({"Hammer", "Clone", "Grab"}) do Instance.new("HopperBin", lp.Backpack).BinType = t end end)
+
+-- IMPROVED GOD MODE
+local god = false
+GodBtn.MouseButton1Click:Connect(function() god = not god GodBtn.Text = "God Mode: " .. (god and "ON" or "OFF") end)
+RunService.Heartbeat:Connect(function() 
+    if god and lp.Character then 
+        local hum = lp.Character:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.Health = 9e9
+            hum.BreakJointsOnDeath = false
+        end
+        -- Void Protection
+        local hrp = lp.Character:FindFirstChild("HumanoidRootPart")
+        if hrp and hrp.Position.Y < (workspace.FallenPartsDestroyHeight + 10) then
+            hrp.Velocity = Vector3.new(0, 0, 0)
+            hrp.CFrame = CFrame.new(0, 100, 0)
+        end
+    end 
+end)
+
+-- FLING LOGIC (STABLE FIX)
+FlingBtn.MouseButton1Click:Connect(function()
+    local target = GetPlayer(TargetBox.Text)
+    if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+        local char = lp.Character
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+
+        CreateNotify("Flinging: " .. target.DisplayName, 2)
+        local oldPos = hrp.CFrame
+        
+        local VelocityLoop
+        VelocityLoop = RunService.Heartbeat:Connect(function()
+            if not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then 
+                if VelocityLoop then VelocityLoop:Disconnect() end
+                return 
+            end
+            
+            for _, v in pairs(char:GetDescendants()) do
+                if v:IsA("BasePart") then v.CanCollide = false end
+            end
+            
+            hrp.CFrame = target.Character.HumanoidRootPart.CFrame
+            hrp.Velocity = Vector3.new(0, 10000, 0)
+        end)
+
+        task.delay(1.5, function()
+            if VelocityLoop then VelocityLoop:Disconnect() end
+            hrp.Velocity = Vector3.new(0, 0, 0)
+            hrp.RotVelocity = Vector3.new(0, 0, 0)
+            hrp.CFrame = oldPos
+            CreateNotify("Fling Finished", 1)
+        end)
+    else
+        CreateNotify("Target not found!", 2)
     end
 end)
