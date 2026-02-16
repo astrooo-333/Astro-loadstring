@@ -41,7 +41,7 @@ Instance.new("UICorner", Title).CornerRadius = UDim.new(0, 15)
 CreditLabel.Parent = MainFrame
 CreditLabel.Size = UDim2.new(1, 0, 0, 20)
 CreditLabel.Position = UDim2.new(0, 0, 0.96, 0)
-CreditLabel.Text = "By sweet_orange"
+CreditLabel.Text = "By Astro"
 CreditLabel.BackgroundTransparency = 1
 CreditLabel.Font = Enum.Font.GothamBold
 CreditLabel.TextSize = 12
@@ -75,9 +75,9 @@ end
 
 -- STARTUP SEQUENCE
 task.spawn(function()
-    CreateNotify("Admin Panel: Loading...", 2)
+    CreateNotify("Loading...", 2)
     task.wait(2.3)
-    CreateNotify("Welcome! By sweet_orange", 2)
+    CreateNotify("Welcome! By Astro", 2)
 end)
 
 local function createBtn(text, pos)
@@ -96,7 +96,6 @@ end
 
 local FlyBtn = createBtn("Fly: OFF", UDim2.new(0.05, 0, 0.12, 0))
 local NoclipBtn = createBtn("Noclip: OFF", UDim2.new(0.05, 0, 0.21, 0))
-local BToolBtn = createBtn("Give Classic BTools", UDim2.new(0.05, 0, 0.35, 0))
 local GodBtn = createBtn("God Mode: OFF", UDim2.new(0.05, 0, 0.45, 0))
 
 local SpeedInput = Instance.new("TextBox", MainFrame)
@@ -189,7 +188,6 @@ local noclip = false
 NoclipBtn.MouseButton1Click:Connect(function() noclip = not noclip NoclipBtn.Text = "Noclip: " .. (noclip and "ON" or "OFF") end)
 RunService.Stepped:Connect(function() if noclip and lp.Character then for _, v in pairs(lp.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end end)
 
-BToolBtn.MouseButton1Click:Connect(function() for _, t in pairs({"Hammer", "Clone", "Grab"}) do Instance.new("HopperBin", lp.Backpack).BinType = t end end)
 
 -- IMPROVED GOD MODE
 local god = false
